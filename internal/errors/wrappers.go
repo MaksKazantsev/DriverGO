@@ -1,14 +1,16 @@
 package errors
 
 import (
-	"errors"
 	"fmt"
-	"gorm.io/gorm"
+	"strings"
 )
 
 func ErrorDBWrapper(err error) error {
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return NewError(ERR_NOT_FOUND, "entity not found: "+err.Error())
+	if strings.Contains(err.Error(), "not found") {
+		return NewError(ERR_NOT_FOUND, "entity not found")
+	}
+	if strings.Contains(err.Error(), "duplicate key") {
+		return NewError(ERR_BAD_REQUEST, "entity already exists")
 	}
 	return NewError(ERR_INTERNAL, "internal db error: "+err.Error())
 }

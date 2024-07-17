@@ -3,8 +3,6 @@ package errors
 import (
 	"context"
 	"errors"
-	"github.com/MaksKazantsev/DriverGO/internal/log"
-	"github.com/MaksKazantsev/DriverGO/internal/utils"
 	"net/http"
 )
 
@@ -38,13 +36,11 @@ func FromError(err error, ctx context.Context) (int, string) {
 	var e *Error
 
 	if !errors.As(err, &e) {
-		utils.ExtractLogger(ctx).Error(err.Error(), &log.Data{})
 		return http.StatusInternalServerError, "unknown error: " + err.Error()
 	}
 
 	switch e.Code {
 	case ERR_INTERNAL:
-		utils.ExtractLogger(ctx).Error(err.Error(), &log.Data{})
 		return http.StatusInternalServerError, "internal error: " + err.Error()
 	case ERR_NOT_ALLOWED:
 		return http.StatusMethodNotAllowed, e.Message
@@ -53,7 +49,6 @@ func FromError(err error, ctx context.Context) (int, string) {
 	case ERR_NOT_FOUND:
 		return http.StatusNotFound, e.Message
 	default:
-		utils.ExtractLogger(ctx).Error(err.Error(), &log.Data{})
 		return http.StatusInternalServerError, "unknown error: " + err.Error()
 	}
 

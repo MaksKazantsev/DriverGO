@@ -1,0 +1,9 @@
+env: local
+port: 3000
+db:
+  postgres:
+    host: 127.0.0.1
+    port: 4000
+    name: driverGO
+    user: postgres
+    password: postgres
