@@ -1,11 +1,11 @@
 package postgres
 
 import (
-	"github.com/MaksKazantsev/DriverGO/internal/db"
+	"github.com/MaksKazantsev/DriverGO/internal/repositories"
 	"gorm.io/gorm"
 )
 
-var _ db.Repository = &Postgres{}
+var _ repositories.Repository = &Postgres{}
 
 type Postgres struct {
 	db *gorm.DB

@@ -60,6 +60,41 @@ paths:
       summary: Login
       tags:
       - Auth
+  /auth/refresh:
+    get:
+      description: Updates token pair.
+      parameters:
+      - description: refresh token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Refresh
+      tags:
+      - Auth
   /auth/register:
     post:
       description: Registers new user.

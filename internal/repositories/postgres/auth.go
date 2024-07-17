@@ -5,16 +5,13 @@ import (
 	"github.com/MaksKazantsev/DriverGO/internal/entity"
 	"github.com/MaksKazantsev/DriverGO/internal/errors"
 	"github.com/MaksKazantsev/DriverGO/internal/service/models"
+	"github.com/MaksKazantsev/DriverGO/internal/utils"
 	"gorm.io/gorm"
 )
 
-func (p *Postgres) Register(ctx context.Context, data models.RegisterReq) (models.AuthResponse, error) {
+func (p *Postgres) Register(ctx context.Context, data entity.User) (models.AuthResponse, error) {
 	err := p.db.Transaction(func(tx *gorm.DB) error {
 		err := tx.Model(&entity.User{}).Create(&data).Error
-		if err != nil {
-			return err
-		}
-		err = tx.Model(&entity.UserProfile{}).Create(&data).Error
 		if err != nil {
 			return err
 		}
@@ -23,7 +20,9 @@ func (p *Postgres) Register(ctx context.Context, data models.RegisterReq) (model
 	if err != nil {
 		return models.AuthResponse{}, errors.ErrorDBWrapper(err)
 	}
-	return models.AuthResponse{RefreshToken: data.RToken, UUID: data.ID}, nil
+
+	utils.ExtractLogger(ctx).Info("repo layers successfully passed", nil)
+	return models.AuthResponse{RefreshToken: data.RFToken, UUID: data.ID}, nil
 }
 
 func (p *Postgres) Login(ctx context.Context, data models.LoginReq) (models.AuthResponse, error) {
@@ -39,4 +38,26 @@ func (p *Postgres) Login(ctx context.Context, data models.LoginReq) (models.Auth
 		return models.AuthResponse{}, errors.ErrorDBWrapper(err)
 	}
 	return models.AuthResponse{RefreshToken: data.RToken, UUID: user.ID}, nil
+}
+
+func (p *Postgres) Refresh(ctx context.Context, uuid, token string) (models.AuthResponse, error) {
+	err := p.db.Model(&entity.User{}).Where("id = ?", uuid).Update("rf_token", token).Error
+	if err != nil {
+		return models.AuthResponse{}, errors.ErrorDBWrapper(err)
+	}
+
+	return models.AuthResponse{
+		RefreshToken: token,
+		UUID:         uuid,
+	}, nil
+}
+
+func (p *Postgres) GetPasswordAndID(ctx context.Context, email string) (string, string, error) {
+	var user entity.User
+	if err := p.db.Model(&entity.User{}).Where("email = ?", email).First(&user).Error; err != nil {
+		return "", "", errors.ErrorRepoWrapper(err)
+	}
+
+	utils.ExtractLogger(ctx).Info("repo layers successfully passed", nil)
+	return user.ID, user.Password, nil
 }
