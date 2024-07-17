@@ -1,0 +1,99 @@
+definitions:
+  models.LoginReq:
+    properties:
+      email:
+        type: string
+      fb_token:
+        type: string
+      password:
+        type: string
+    type: object
+  models.RegisterReq:
+    properties:
+      email:
+        type: string
+      fb_token:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+info:
+  contact: {}
+  title: DriverGO server API
+  version: "1.0"
+paths:
+  /auth/login:
+    put:
+      description: Logins user to the system.
+      parameters:
+      - description: login request
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Login
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      description: Registers new user.
+      parameters:
+      - description: register request
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.RegisterReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Register
+      tags:
+      - Auth
+swagger: "2.0"
