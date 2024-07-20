@@ -7,11 +7,21 @@ import (
 	"github.com/MaksKazantsev/DriverGO/internal/service/models"
 	"github.com/MaksKazantsev/DriverGO/internal/utils"
 	"gorm.io/gorm"
+	"time"
 )
 
 func (p *Postgres) Register(ctx context.Context, data entity.User) (models.AuthResponse, error) {
 	err := p.db.Transaction(func(tx *gorm.DB) error {
 		err := tx.Model(&entity.User{}).Create(&data).Error
+		if err != nil {
+			return err
+		}
+		err = tx.Model(&entity.UserProfile{}).Create(&entity.UserProfile{
+			ID:        data.ID,
+			Username:  data.Username,
+			Email:     data.Email,
+			RentHours: 0 * time.Second,
+		}).Error
 		if err != nil {
 			return err
 		}
@@ -34,9 +44,11 @@ func (p *Postgres) Login(ctx context.Context, data models.LoginReq) (models.Auth
 		}
 		return nil
 	})
+
 	if err != nil {
 		return models.AuthResponse{}, errors.ErrorDBWrapper(err)
 	}
+	utils.ExtractLogger(ctx).Info("repo layers successfully passed", nil)
 	return models.AuthResponse{RefreshToken: data.RToken, UUID: user.ID}, nil
 }
 

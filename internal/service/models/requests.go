@@ -15,3 +15,8 @@ type LoginReq struct {
 	RToken   string `json:"-"`
 	FBToken  string `json:"fb_token"`
 }
+
+type CarReq struct {
+	Brand string `json:"brand"`
+	Class string `json:"class"`
+}

@@ -53,3 +53,8 @@ func FromError(err error, ctx context.Context) (int, string) {
 	}
 
 }
+
+type HTTPError struct {
+	ErrorCode int    `json:"error_code"`
+	ErrorMsg  string `json:"error_msg"`
+}

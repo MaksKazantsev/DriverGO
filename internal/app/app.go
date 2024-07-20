@@ -16,7 +16,7 @@ import (
 
 func MustStart(cfg *config.Config) {
 	// Loading .env file
-	if err := godotenv.Load(); err != nil {
+	if err := godotenv.Load(".env"); err != nil {
 		panic("failed to load .env file: " + err.Error())
 	}
 

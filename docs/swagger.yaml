@@ -1,4 +1,18 @@
 definitions:
+  errors.HTTPError:
+    properties:
+      error_code:
+        type: integer
+      error_msg:
+        type: string
+    type: object
+  models.CarReq:
+    properties:
+      brand:
+        type: string
+      class:
+        type: string
+    type: object
   models.LoginReq:
     properties:
       email:
@@ -44,19 +58,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            type: string
+            $ref: '#/definitions/errors.HTTPError'
         "404":
           description: Not Found
           schema:
-            type: string
+            $ref: '#/definitions/errors.HTTPError'
         "405":
           description: Method Not Allowed
           schema:
-            type: string
+            $ref: '#/definitions/errors.HTTPError'
         "500":
           description: Internal Server Error
           schema:
-            type: string
+            $ref: '#/definitions/errors.HTTPError'
       summary: Login
       tags:
       - Auth
@@ -79,19 +93,19 @@ paths:
         "400":
           description: Bad Request
           schema:
-            type: string
+            $ref: '#/definitions/errors.HTTPError'
         "404":
           description: Not Found
           schema:
-            type: string
+            $ref: '#/definitions/errors.HTTPError'
         "405":
           description: Method Not Allowed
           schema:
-            type: string
+            $ref: '#/definitions/errors.HTTPError'
         "500":
           description: Internal Server Error
           schema:
-            type: string
+            $ref: '#/definitions/errors.HTTPError'
       summary: Refresh
       tags:
       - Auth
@@ -115,20 +129,218 @@ paths:
         "400":
           description: Bad Request
           schema:
-            type: string
+            $ref: '#/definitions/errors.HTTPError'
         "404":
           description: Not Found
           schema:
-            type: string
+            $ref: '#/definitions/errors.HTTPError'
         "405":
           description: Method Not Allowed
           schema:
-            type: string
+            $ref: '#/definitions/errors.HTTPError'
         "500":
           description: Internal Server Error
           schema:
-            type: string
+            $ref: '#/definitions/errors.HTTPError'
       summary: Register
       tags:
       - Auth
+  /v1/admin/add:
+    post:
+      description: Adds new car to the pool of available cars. Can be executed only
+        by admin.
+      parameters:
+      - description: car request
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.CarReq'
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      summary: AddCar
+      tags:
+      - CarManagement
+  /v1/admin/remove/{carID}:
+    delete:
+      description: Removes car from the pool of available cars. Can be executed only
+        by admin.
+      parameters:
+      - description: car`s ID
+        in: path
+        name: carID
+        required: true
+        type: string
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      summary: RemoveCar
+      tags:
+      - CarManagement
+  /v1/rent/{carID}:
+    post:
+      description: Starts new rent.
+      parameters:
+      - description: car ID
+        in: path
+        name: carID
+        required: true
+        type: string
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      summary: StartRent
+      tags:
+      - Rent
+  /v1/rent/{rentID}:
+    delete:
+      description: Finishes rent.
+      parameters:
+      - description: rent ID
+        in: path
+        name: rentID
+        required: true
+        type: string
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      summary: FinishRent
+      tags:
+      - Rent
+  /v1/rent/history:
+    get:
+      description: Gets all user`s rents.
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      summary: GetRentHistory
+      tags:
+      - Rent
 swagger: "2.0"

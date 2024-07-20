@@ -37,13 +37,14 @@ func NewToken(t TokenType, data TokenData) (string, error) {
 	case ACCESS:
 		cl["id"] = data.ID
 		cl["role"] = data.Role
-		cl["exp"] = time.Now().Add(ParseDuration(os.Getenv("ACCESS_TOKEN_TTL"), 1))
+		cl["exp"] = time.Now().Add(time.Minute * 60).Unix()
 	case REFRESH:
 		cl["id"] = data.ID
-		cl["exp"] = time.Now().Add(ParseDuration(os.Getenv("REFRESH_TOKEN_TTL"), 30))
+		cl["role"] = data.Role
+		cl["exp"] = time.Now().Add(time.Minute * 60 * 24 * 30).Unix()
 	}
 
-	stringToken, err := token.SignedString([]byte(KEY))
+	stringToken, err := token.SignedString([]byte("TOKEN_SECRET_KEY"))
 	if err != nil {
 		return "", errors.NewError(errors.ERR_INTERNAL, "failed to sign token: "+err.Error())
 	}
@@ -52,7 +53,7 @@ func NewToken(t TokenType, data TokenData) (string, error) {
 
 func ParseToken(token string) (jwt.MapClaims, error) {
 	t, err := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
-		return []byte(KEY), nil
+		return []byte("TOKEN_SECRET_KEY"), nil
 	})
 	if err != nil {
 		return nil, errors.NewError(errors.ERR_NOT_ALLOWED, "invalid token")

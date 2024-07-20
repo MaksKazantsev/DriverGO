@@ -20,8 +20,6 @@ type Auth struct {
 	repo repositories.Auth
 }
 
-var _ Authorization = &Auth{}
-
 func NewAuth(repo repositories.Auth) Authorization {
 	return &Auth{repo: repo}
 }

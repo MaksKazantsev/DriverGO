@@ -3,6 +3,7 @@ package handlers
 import (
 	appHandlers "github.com/MaksKazantsev/DriverGO/internal/handlers/http"
 	"github.com/MaksKazantsev/DriverGO/internal/log"
+	"github.com/MaksKazantsev/DriverGO/internal/middleware"
 	"github.com/MaksKazantsev/DriverGO/internal/middleware/wrappers"
 	"github.com/MaksKazantsev/DriverGO/internal/service"
 	"github.com/MaksKazantsev/DriverGO/internal/utils/validator"
@@ -19,17 +20,29 @@ type controller struct {
 
 	UserHandler *appHandlers.UserHandler
 	AuthHandler *appHandlers.AuthHandler
+	RentHandler *appHandlers.RentHandler
+	CarHandler  *appHandlers.CarHandler
 }
 
 func NewController(srvc *service.Service) Controller {
-	return &controller{srvc: srvc, AuthHandler: appHandlers.RegisterAuthHandler(srvc.Authorization, validator.NewValidator())}
+	return &controller{srvc: srvc, AuthHandler: appHandlers.RegisterAuthHandler(srvc.Authorization, validator.NewValidator()), RentHandler: appHandlers.RegisterRentHandler(srvc), CarHandler: appHandlers.RegisterCarHandler(srvc)}
 }
 
 func (c controller) SetupRoutes(app *fiber.App, log log.Logger) {
 	app.Get("/swagger/*", fiberSwagger.WrapHandler)
-	
+
 	auth := app.Group("/auth").Use(wrappers.EmbedLogger(log), wrappers.WithIdempotencyKey())
 	auth.Post("/register", c.AuthHandler.Register)
 	auth.Put("/login", c.AuthHandler.Login)
 	auth.Get("/refresh", c.AuthHandler.Refresh)
+
+	v1 := app.Group("/v1").Use(wrappers.EmbedLogger(log), wrappers.WithIdempotencyKey())
+	rent := v1.Group("/rent").Use(middleware.CheckAuth())
+	rent.Post("/:carID", c.RentHandler.StartRent)
+	rent.Delete("/:rentID", c.RentHandler.FinishRent)
+	rent.Get("/history", c.RentHandler.GetRentHistory)
+
+	admin := v1.Group("/admin").Use(middleware.RejectNotAdmin(), wrappers.EmbedLogger(log), wrappers.WithIdempotencyKey())
+	admin.Post("/add", c.CarHandler.AddCar)
+	admin.Delete("/remove", c.CarHandler.RemoveCar)
 }

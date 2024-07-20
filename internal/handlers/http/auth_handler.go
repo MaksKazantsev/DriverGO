@@ -29,10 +29,10 @@ type AuthHandler struct {
 // @Produce json
 // @Param input body models.RegisterReq true "register request"
 // @Success 201 {object} int
-// @Failure 400 {object} string
-// @Failure 404 {object} string
-// @Failure 405 {object} string
-// @Failure 500 {object} string
+// @Failure 400 {object} errors.HTTPError
+// @Failure 404 {object} errors.HTTPError
+// @Failure 405 {object} errors.HTTPError
+// @Failure 500 {object} errors.HTTPError
 // @Router /auth/register [post]
 func (a *AuthHandler) Register(c *fiber.Ctx) error {
 	var req models.RegisterReq
@@ -48,7 +48,7 @@ func (a *AuthHandler) Register(c *fiber.Ctx) error {
 	data, err := a.uc.Register(c.UserContext(), req)
 	if err != nil {
 		st, msg := errors.FromError(err, c.Context())
-		_ = c.Status(st).SendString(msg)
+		_ = c.Status(st).JSON(errors.HTTPError{ErrorCode: st, ErrorMsg: msg})
 		return nil
 	}
 
@@ -64,10 +64,10 @@ func (a *AuthHandler) Register(c *fiber.Ctx) error {
 // @Param input body models.LoginReq true "login request"
 //
 //	@Success        200 {object} int
-//	@Failure        400 {object} string
-//	@Failure        404 {object} string
-//	@Failure        405 {object} string
-//	@Failure        500 {object} string
+//	@Failure        400 {object} errors.HTTPError
+//	@Failure        404 {object} errors.HTTPError
+//	@Failure        405 {object} errors.HTTPError
+//	@Failure        500 {object} errors.HTTPError
 //	@Router         /auth/login [put]
 func (a *AuthHandler) Login(c *fiber.Ctx) error {
 	var req models.LoginReq
@@ -84,7 +84,7 @@ func (a *AuthHandler) Login(c *fiber.Ctx) error {
 	data, err := a.uc.Login(c.UserContext(), req)
 	if err != nil {
 		st, msg := errors.FromError(err, c.Context())
-		_ = c.Status(st).SendString(msg)
+		_ = c.Status(st).JSON(errors.HTTPError{ErrorCode: st, ErrorMsg: msg})
 		return nil
 	}
 
@@ -100,10 +100,10 @@ func (a *AuthHandler) Login(c *fiber.Ctx) error {
 // @Param Authorization header string true "refresh token"
 //
 //	@Success        200 {object} int
-//	@Failure        400 {object} string
-//	@Failure        404 {object} string
-//	@Failure        405 {object} string
-//	@Failure        500 {object} string
+//	@Failure        400 {object} errors.HTTPError
+//	@Failure        404 {object} errors.HTTPError
+//	@Failure        405 {object} errors.HTTPError
+//	@Failure        500 {object} errors.HTTPError
 //	@Router         /auth/refresh [get]
 func (a *AuthHandler) Refresh(c *fiber.Ctx) error {
 	token := extractAuthHeader(c)
@@ -111,7 +111,9 @@ func (a *AuthHandler) Refresh(c *fiber.Ctx) error {
 	data, err := a.uc.Refresh(c.UserContext(), token)
 	if err != nil {
 		st, msg := errors.FromError(err, c.Context())
-		_ = c.Status(st).SendString(msg)
+		_ = c.Status(st).JSON(errors.HTTPError{
+			ErrorCode: st, ErrorMsg: msg,
+		})
 		return nil
 	}
 

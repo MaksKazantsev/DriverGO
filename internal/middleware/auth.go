@@ -8,6 +8,32 @@ import (
 	"time"
 )
 
+func RejectNotAdmin() fiber.Handler {
+	return func(ctx *fiber.Ctx) error {
+		values := ctx.Get("Authorization")
+		valuesArr := strings.Split(values, " ")
+
+		if len(valuesArr) != 2 {
+			_ = ctx.Status(http.StatusMethodNotAllowed).SendString("token is not provided")
+			return nil
+		}
+
+		claims, err := utils.ParseToken(valuesArr[1])
+		if err != nil {
+			_ = ctx.Status(http.StatusMethodNotAllowed).SendString(err.Error())
+		}
+
+		role, ok := claims["role"]
+		if role != "admin" || !ok {
+			_ = ctx.Status(http.StatusMethodNotAllowed).SendString("rejected: invalid permission level")
+			return nil
+		}
+
+		_ = ctx.Next()
+		return nil
+	}
+}
+
 func CheckAuth() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
 		values := ctx.Get("Authorization")
@@ -18,7 +44,7 @@ func CheckAuth() fiber.Handler {
 			return nil
 		}
 
-		if valuesArr[0] != "Bearer" {
+		if valuesArr[0] != "Bearer:" {
 			_ = ctx.Status(http.StatusBadRequest).SendString("wrong request signature")
 			return nil
 		}
@@ -30,13 +56,13 @@ func CheckAuth() fiber.Handler {
 
 		_, ok := claims["id"].(string)
 		if !ok {
-			_ = ctx.Status(http.StatusMethodNotAllowed).SendString("invalid token")
+			_ = ctx.Status(http.StatusMethodNotAllowed).SendString("middleware: invalid token")
 			return nil
 		}
 
 		exp, ok := claims["exp"].(float64)
 		if !ok {
-			_ = ctx.Status(http.StatusMethodNotAllowed).SendString("invalid token")
+			_ = ctx.Status(http.StatusMethodNotAllowed).SendString("middleware: invalid token")
 			return nil
 		}
 

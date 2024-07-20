@@ -15,6 +15,16 @@ func ErrorDBWrapper(err error) error {
 	return NewError(ERR_INTERNAL, "internal db error: "+err.Error())
 }
 
+func ErrorDBWrapperC(err error, notFound, exists string) error {
+	if strings.Contains(err.Error(), "not found") {
+		return NewError(ERR_NOT_FOUND, notFound)
+	}
+	if strings.Contains(err.Error(), "duplicate key") {
+		return NewError(ERR_BAD_REQUEST, exists)
+	}
+	return NewError(ERR_INTERNAL, "internal db error: "+err.Error())
+}
+
 func ErrorRepoWrapper(err error) error {
 	return fmt.Errorf("repo error: %w", err)
 }
