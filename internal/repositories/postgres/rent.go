@@ -72,13 +72,18 @@ func (p *Postgres) GetRentHistory(ctx context.Context, userID string) ([]entity.
 func (p *Postgres) GetAvailableCars(ctx context.Context) ([]entity.Car, error) {
 	var carsIDs []string
 
-	err := p.db.Model(&entity.Car{}).Pluck("id", &carsIDs).Error
+	err := p.db.Model(&entity.Rent{}).Pluck("car_id", &carsIDs).Error
 	if err != nil {
 		return nil, errors.ErrorDBWrapper(err)
 	}
 
 	var cars []entity.Car
-	err = p.db.Model(&entity.Rent{}).Where("car_id NOT IN ?", carsIDs).Find(&cars).Error
+	q := p.db.Model(&entity.Car{})
+	if len(carsIDs) > 0 {
+		q = q.Where("id NOT IN ?", carsIDs)
+	}
+
+	err = q.Find(&cars).Error
 	if err != nil {
 		return nil, errors.ErrorDBWrapper(err)
 	}

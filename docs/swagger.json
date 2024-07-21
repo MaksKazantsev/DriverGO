@@ -233,14 +233,14 @@
         },
         "/v1/admin/remove/{carID}": {
             "delete": {
-                "description": "Removes car from the pool of available cars. Can be executed only by admin.",
+                "description": "Edits car from the pool of available cars. Can be executed only by admin.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "CarManagement"
                 ],
-                "summary": "RemoveCar",
+                "summary": "EditCar",
                 "parameters": [
                     {
                         "type": "string",
@@ -248,6 +248,15 @@
                         "name": "carID",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "car request",
+                        "name": "input",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CarReq"
+                        }
                     },
                     {
                         "type": "string",
@@ -260,6 +269,59 @@
                 "responses": {
                     "201": {
                         "description": "Created",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/rent/available": {
+            "get": {
+                "description": "Gets all available cars at the moment.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rent"
+                ],
+                "summary": "GetAvailableCars",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "type": "integer"
                         }

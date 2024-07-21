@@ -189,7 +189,7 @@ paths:
       - CarManagement
   /v1/admin/remove/{carID}:
     delete:
-      description: Removes car from the pool of available cars. Can be executed only
+      description: Edits car from the pool of available cars. Can be executed only
         by admin.
       parameters:
       - description: car`s ID
@@ -197,6 +197,12 @@ paths:
         name: carID
         required: true
         type: string
+      - description: car request
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.CarReq'
       - description: token
         in: header
         name: Authorization
@@ -225,7 +231,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/errors.HTTPError'
-      summary: RemoveCar
+      summary: EditCar
       tags:
       - CarManagement
   /v1/rent/{carID}:
@@ -306,6 +312,41 @@ paths:
           schema:
             $ref: '#/definitions/errors.HTTPError'
       summary: FinishRent
+      tags:
+      - Rent
+  /v1/rent/available:
+    get:
+      description: Gets all available cars at the moment.
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      summary: GetAvailableCars
       tags:
       - Rent
   /v1/rent/history:

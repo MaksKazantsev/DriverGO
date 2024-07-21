@@ -13,6 +13,7 @@ import (
 type CarManagement interface {
 	AddCar(ctx context.Context, data models.CarReq) error
 	RemoveCar(ctx context.Context, carID string) error
+	EditCar(ctx context.Context, data models.CarReq, carID string) error
 }
 
 type carManagement struct {
@@ -41,6 +42,13 @@ func (c *carManagement) AddCar(ctx context.Context, data models.CarReq) error {
 
 func (c *carManagement) RemoveCar(ctx context.Context, carID string) error {
 	if err := c.repo.RemoveCar(ctx, carID); err != nil {
+		return errors.ErrorRepoWrapper(err)
+	}
+	return nil
+}
+
+func (c *carManagement) EditCar(ctx context.Context, data models.CarReq, carID string) error {
+	if err := c.repo.EditCar(ctx, data, carID); err != nil {
 		return errors.ErrorRepoWrapper(err)
 	}
 	return nil

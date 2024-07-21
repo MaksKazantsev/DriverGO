@@ -5,13 +5,11 @@ import (
 	"gorm.io/gorm"
 )
 
-var _ repositories.Repository = &Postgres{}
-
 type Postgres struct {
 	db *gorm.DB
 }
 
-func NewRepository(db *gorm.DB) *Postgres {
+func NewRepository(db *gorm.DB) repositories.Repository {
 	return &Postgres{
 		db: db,
 	}

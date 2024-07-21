@@ -87,7 +87,7 @@ func (r *RentHandler) FinishRent(c *fiber.Ctx) error {
 func (r *RentHandler) GetRentHistory(c *fiber.Ctx) error {
 	token := extractAuthHeader(c)
 
-	rents, err := r.uc.GetRents(c.UserContext(), token)
+	rents, err := r.uc.GetRentHistory(c.UserContext(), token)
 	if err != nil {
 		st, msg := errors.FromError(err, c.UserContext())
 		_ = c.Status(st).JSON(errors.HTTPError{ErrorCode: st, ErrorMsg: msg})
@@ -95,5 +95,29 @@ func (r *RentHandler) GetRentHistory(c *fiber.Ctx) error {
 	}
 
 	_ = c.Status(http.StatusOK).JSON(fiber.Map{"rents": rents})
+	return nil
+}
+
+// GetAvailableCars godoc
+// @Summary GetAvailableCars
+// @Description Gets all available cars at the moment.
+// @Tags Rent
+// @Produce json
+// @Param Authorization header string true "token"
+// @Success 200 {object} int
+// @Failure 400 {object} errors.HTTPError
+// @Failure 404 {object} errors.HTTPError
+// @Failure 405 {object} errors.HTTPError
+// @Failure 500 {object} errors.HTTPError
+// @Router /v1/rent/available [get]
+func (r *RentHandler) GetAvailableCars(c *fiber.Ctx) error {
+	cars, err := r.uc.GetAvailableCars(c.UserContext())
+	if err != nil {
+		st, msg := errors.FromError(err, c.UserContext())
+		_ = c.Status(st).JSON(errors.HTTPError{ErrorCode: st, ErrorMsg: msg})
+		return nil
+	}
+
+	_ = c.Status(http.StatusOK).JSON(fiber.Map{"cars": cars})
 	return nil
 }

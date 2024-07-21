@@ -21,10 +21,11 @@ type Auth interface {
 type Rent interface {
 	StartRent(ctx context.Context, userID, carID string) error
 	FinishRent(ctx context.Context, userID, rentID string) (entity.Bill, error)
-	GetRentHistory(ctx context.Context, userID string) ([]entity.Rent, error)
+	GetRentHistory(ctx context.Context, userID string) ([]entity.RentHistory, error)
 	GetAvailableCars(ctx context.Context) ([]entity.Car, error)
 }
 type CarManagement interface {
 	AddCar(ctx context.Context, car entity.Car) error
 	RemoveCar(ctx context.Context, carID string) error
+	EditCar(ctx context.Context, data models.CarReq, carID string) error
 }

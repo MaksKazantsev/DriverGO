@@ -12,7 +12,8 @@ import (
 type Rent interface {
 	StartRent(ctx context.Context, token string, carID string) error
 	FinishRent(ctx context.Context, token string, rentID string) (entity.Bill, error)
-	GetRents(ctx context.Context, token string) ([]entity.Rent, error)
+	GetRentHistory(ctx context.Context, token string) ([]entity.RentHistory, error)
+	GetAvailableCars(ctx context.Context) ([]entity.Car, error)
 }
 
 type rent struct {
@@ -45,6 +46,7 @@ func (r *rent) FinishRent(ctx context.Context, token string, rentID string) (ent
 	id := cl["id"].(string)
 
 	utils.ExtractLogger(ctx).Info("service layers successfully passed", nil)
+
 	bill, err := r.repo.FinishRent(ctx, id, rentID)
 	if err != nil {
 		return entity.Bill{}, errors.ErrorRepoWrapper(err)
@@ -53,7 +55,7 @@ func (r *rent) FinishRent(ctx context.Context, token string, rentID string) (ent
 	return bill, nil
 }
 
-func (r *rent) GetRents(ctx context.Context, token string) ([]entity.Rent, error) {
+func (r *rent) GetRentHistory(ctx context.Context, token string) ([]entity.RentHistory, error) {
 	cl, err := utils.ParseToken(token)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parase token: %w", err)
@@ -62,8 +64,20 @@ func (r *rent) GetRents(ctx context.Context, token string) ([]entity.Rent, error
 
 	utils.ExtractLogger(ctx).Info("service layers successfully passed", nil)
 	rents, err := r.repo.GetRentHistory(ctx, id)
+
 	if err != nil {
 		return nil, errors.ErrorRepoWrapper(err)
 	}
 	return rents, nil
+}
+
+func (r *rent) GetAvailableCars(ctx context.Context) ([]entity.Car, error) {
+	utils.ExtractLogger(ctx).Info("service layers successfully passed", nil)
+
+	cars, err := r.repo.GetAvailableCars(ctx)
+	if err != nil {
+		return nil, errors.ErrorRepoWrapper(err)
+	}
+
+	return cars, nil
 }
