@@ -14,8 +14,6 @@ import (
 	"syscall"
 )
 
-// go: generate
-
 func MustStart(cfg *config.Config) {
 	// Loading .env file
 	if err := godotenv.Load(".env"); err != nil {

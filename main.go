@@ -6,7 +6,7 @@ import (
 	"github.com/MaksKazantsev/DriverGO/internal/config"
 )
 
-//go:generate mockgen -source=./internal/service/auth.go -destination=./internal/tests/mocks/mock_auth.go
+//go:generate mockgen -source=./internal/log/logger.go -destination=./internal/tests/mocks/logger/loggerMock.go
 
 // @title DriverGO server API
 // @version 1.0
