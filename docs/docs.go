@@ -178,7 +178,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/admin/add": {
+        "/v1/admin/": {
             "post": {
                 "description": "Adds new car to the pool of available cars. Can be executed only by admin.",
                 "produces": [
@@ -240,8 +240,8 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/admin/remove/{carID}": {
-            "delete": {
+        "/v1/admin/{carID}": {
+            "put": {
                 "description": "Edits car from the pool of available cars. Can be executed only by admin.",
                 "produces": [
                     "application/json"
@@ -276,8 +276,66 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    },
+                    "405": {
+                        "description": "Method Not Allowed",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/errors.HTTPError"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Removes car from the pool of available cars. Can be executed only by admin.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CarManagement"
+                ],
+                "summary": "RemoveCar",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "car` + "`" + `s ID",
+                        "name": "carID",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "token",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
                         "schema": {
                             "type": "integer"
                         }

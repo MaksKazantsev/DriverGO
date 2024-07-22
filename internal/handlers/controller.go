@@ -44,6 +44,7 @@ func (c controller) SetupRoutes(app *fiber.App, log log.Logger) {
 	rent.Get("/available", c.RentHandler.GetAvailableCars)
 
 	admin := v1.Group("/admin").Use(middleware.RejectNotAdmin(), wrappers.EmbedLogger(log), wrappers.WithIdempotencyKey())
-	admin.Post("/add", c.CarHandler.AddCar)
-	admin.Delete("/remove", c.CarHandler.RemoveCar)
+	admin.Post("/", c.CarHandler.AddCar)
+	admin.Delete("/:carID", c.CarHandler.RemoveCar)
+	admin.Put("/:carID", c.CarHandler.EditCar)
 }

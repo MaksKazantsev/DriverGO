@@ -30,7 +30,7 @@ func RegisterCarHandler(uc service.CarManagement) *CarHandler {
 // @Failure 404 {object} errors.HTTPError
 // @Failure 405 {object} errors.HTTPError
 // @Failure 500 {object} errors.HTTPError
-// @Router /v1/admin/add [post]
+// @Router /v1/admin/ [post]
 func (cr *CarHandler) AddCar(c *fiber.Ctx) error {
 	var req models.CarReq
 
@@ -57,12 +57,12 @@ func (cr *CarHandler) AddCar(c *fiber.Ctx) error {
 // @Produce json
 // @Param carID path string true "car`s ID"
 // @Param Authorization header string true "token"
-// @Success 201 {object} int
+// @Success 200 {object} int
 // @Failure 400 {object} errors.HTTPError
 // @Failure 404 {object} errors.HTTPError
 // @Failure 405 {object} errors.HTTPError
 // @Failure 500 {object} errors.HTTPError
-// @Router /v1/admin/remove/{carID} [delete]
+// @Router /v1/admin/{carID} [delete]
 func (cr *CarHandler) RemoveCar(c *fiber.Ctx) error {
 	carID := c.Params("carID")
 
@@ -84,12 +84,12 @@ func (cr *CarHandler) RemoveCar(c *fiber.Ctx) error {
 // @Param carID path string true "car`s ID"
 // @Param input body models.CarReq true "car request"
 // @Param Authorization header string true "token"
-// @Success 201 {object} int
+// @Success 200 {object} int
 // @Failure 400 {object} errors.HTTPError
 // @Failure 404 {object} errors.HTTPError
 // @Failure 405 {object} errors.HTTPError
 // @Failure 500 {object} errors.HTTPError
-// @Router /v1/admin/remove/{carID} [delete]
+// @Router /v1/admin/{carID} [put]
 func (cr *CarHandler) EditCar(c *fiber.Ctx) error {
 	var req models.CarReq
 

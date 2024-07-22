@@ -145,7 +145,7 @@ paths:
       summary: Register
       tags:
       - Auth
-  /v1/admin/add:
+  /v1/admin/:
     post:
       description: Adds new car to the pool of available cars. Can be executed only
         by admin.
@@ -187,8 +187,48 @@ paths:
       summary: AddCar
       tags:
       - CarManagement
-  /v1/admin/remove/{carID}:
+  /v1/admin/{carID}:
     delete:
+      description: Removes car from the pool of available cars. Can be executed only
+        by admin.
+      parameters:
+      - description: car`s ID
+        in: path
+        name: carID
+        required: true
+        type: string
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      summary: RemoveCar
+      tags:
+      - CarManagement
+    put:
       description: Edits car from the pool of available cars. Can be executed only
         by admin.
       parameters:
@@ -211,8 +251,8 @@ paths:
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           schema:
             type: integer
         "400":

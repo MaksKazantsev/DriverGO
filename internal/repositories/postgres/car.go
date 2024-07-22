@@ -27,9 +27,12 @@ func (p *Postgres) RemoveCar(ctx context.Context, carID string) error {
 		return errors.NewError(errors.ERR_BAD_REQUEST, "car is rented")
 	}
 
-	err = p.db.Where("id = ?", carID).Delete(&entity.Car{}).Error
+	res := p.db.Model(&entity.Car{}).Where("id = ?", carID).Delete(&entity.Car{})
+	if res.RowsAffected == 0 {
+		return errors.NewError(errors.ERR_NOT_FOUND, "car does not exist")
+	}
 	if err != nil {
-		return errors.NewError(errors.ERR_INTERNAL, err.Error())
+		return errors.ErrorDBWrapper(res.Error)
 	}
 	return nil
 }
@@ -46,9 +49,12 @@ func (p *Postgres) EditCar(ctx context.Context, data models.CarReq, carID string
 		return errors.NewError(errors.ERR_BAD_REQUEST, "car is rented")
 	}
 
-	err = p.db.Where("id = ?", carID).Updates(map[string]interface{}{"class": data.Class, "brand": data.Brand}).Error
-	if err != nil {
-		return errors.NewError(errors.ERR_INTERNAL, err.Error())
+	res := p.db.Where("id = ?", carID).Updates(&entity.Car{Class: data.Class, Brand: data.Brand})
+	if res.RowsAffected == 0 {
+		return errors.NewError(errors.ERR_NOT_FOUND, "car does not exist")
+	}
+	if res.Error != nil {
+		return errors.ErrorDBWrapper(res.Error)
 	}
 	return nil
 }
