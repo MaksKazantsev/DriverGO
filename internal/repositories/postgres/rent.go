@@ -28,15 +28,17 @@ func (p *Postgres) StartRent(ctx context.Context, userID, carID string) error {
 
 func (p *Postgres) FinishRent(ctx context.Context, userID, rentID string) (entity.Bill, error) {
 	var rent entity.Rent
-	err := p.db.Model(&entity.Rent{}).Where("id = ?", rentID).
+	res := p.db.Model(&entity.Rent{}).Where("id = ?", rentID).
 		Where("user_id = ?", userID).
 		First(&rent).
-		Delete(&rent).
-		Error
+		Delete(&rent)
+	if res.Error != nil {
+		return entity.Bill{}, errors.ErrorDBWrapper(res.Error)
+	}
 
 	finishTime := time.Since(rent.StartTime)
 
-	err = p.db.Model(&entity.RentHistory{}).Create(&entity.RentHistory{ID: rentID, CarID: rent.CarID, UserID: userID, CarClass: rent.CarClass, RentDuration: finishTime}).Error
+	err := p.db.Model(&entity.RentHistory{}).Create(&entity.RentHistory{ID: rentID, CarID: rent.CarID, UserID: userID, CarClass: rent.CarClass, RentDuration: finishTime}).Error
 	if err != nil {
 		return entity.Bill{}, errors.ErrorDBWrapper(err)
 	}
