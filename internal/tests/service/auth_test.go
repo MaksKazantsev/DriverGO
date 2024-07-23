@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"github.com/MaksKazantsev/DriverGO/internal/notifications"
 	"github.com/MaksKazantsev/DriverGO/internal/service"
 	"github.com/MaksKazantsev/DriverGO/internal/service/models"
 	mock_service "github.com/MaksKazantsev/DriverGO/internal/tests/mocks"
@@ -19,9 +20,10 @@ func TestAuthSuite(t *testing.T) {
 func (a *AuthTest) SetupTest() {
 	a.ctrl = gomock.NewController(a.T())
 	a.repo = mock_service.NewMockRepository(a.ctrl)
+	a.noti = notifications.NewNotifier(a.repo)
 
 	logger := mock_log.NewMockLogger(a.ctrl)
-	logger.EXPECT().Info(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().Trace(gomock.Any(), gomock.Any()).AnyTimes()
 
 	a.ctx = context.WithValue(context.Background(), utils.IdempotencyKey, uuid.NewString())
 	a.ctx = context.WithValue(a.ctx, utils.LoggerKey, logger)
@@ -38,6 +40,7 @@ type AuthTest struct {
 
 	ctrl *gomock.Controller
 	repo *mock_service.MockRepository
+	noti notifications.Notifier
 }
 
 func (a *AuthTest) TestRefreshToken() {
@@ -50,7 +53,7 @@ func (a *AuthTest) TestRefreshToken() {
 	token, _ := utils.NewToken(utils.REFRESH, utils.TokenData{ID: "1", Role: "user"})
 	a.repo.EXPECT().Refresh(gomock.Any(), "1", gomock.AssignableToTypeOf(token)).Times(1).Return(res, nil)
 
-	res, err := service.NewService(a.repo).Refresh(a.ctx, token)
+	res, err := service.NewService(a.repo, a.noti).Refresh(a.ctx, token)
 	a.Require().NoError(err)
 	a.Require().Equal("1", res.UUID)
 	a.Require().NotEqual(token, res.RefreshToken)

@@ -31,7 +31,7 @@ func (p *Postgres) Register(ctx context.Context, data entity.User) (models.AuthR
 		return models.AuthResponse{}, errors.ErrorDBWrapper(err)
 	}
 
-	utils.ExtractLogger(ctx).Info("repo layers successfully passed", nil)
+	utils.ExtractLogger(ctx).Trace(utils.ExtractIdempotencyKey(ctx), "repo layers successfully passed")
 	return models.AuthResponse{RefreshToken: data.RFToken, UUID: data.ID}, nil
 }
 

@@ -46,7 +46,7 @@ func (a *Auth) Register(ctx context.Context, data models.RegisterReq) (models.Au
 		return models.AuthResponse{}, fmt.Errorf("failed to generate token: %w", err)
 	}
 
-	utils.ExtractLogger(ctx).Info("service layers successfully passed", nil)
+	utils.ExtractLogger(ctx).Trace(utils.ExtractIdempotencyKey(ctx), "service layers successfully passed")
 	res, err := a.repo.Register(ctx, UserReqToEntity(data))
 	if err != nil {
 		return models.AuthResponse{}, errors.ErrorRepoWrapper(err)
@@ -77,7 +77,7 @@ func (a *Auth) Login(ctx context.Context, data models.LoginReq) (models.AuthResp
 		return models.AuthResponse{}, fmt.Errorf("failed to generate token: %w", err)
 	}
 
-	utils.ExtractLogger(ctx).Info("service layers successfully passed", nil)
+	utils.ExtractLogger(ctx).Trace(utils.ExtractIdempotencyKey(ctx), "service layers successfully passed")
 
 	res, err := a.repo.Login(ctx, data)
 	if err != nil {
@@ -107,7 +107,7 @@ func (a *Auth) Refresh(ctx context.Context, token string) (models.AuthResponse, 
 		return models.AuthResponse{}, fmt.Errorf("failed to generate token: %w", err)
 	}
 
-	utils.ExtractLogger(ctx).Info("service layers successfully passed", nil)
+	utils.ExtractLogger(ctx).Trace(utils.ExtractIdempotencyKey(ctx), "service layers successfully passed")
 
 	res, err := a.repo.Refresh(ctx, id, RToken)
 	if err != nil {

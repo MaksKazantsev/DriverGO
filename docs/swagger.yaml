@@ -145,6 +145,46 @@ paths:
       summary: Register
       tags:
       - Auth
+  /v1/{userID}:
+    get:
+      description: Gets user`s profile.
+      parameters:
+      - description: userID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      summary: GetProfile
+      tags:
+      - User
   /v1/admin/:
     post:
       description: Adds new car to the pool of available cars. Can be executed only
@@ -274,6 +314,41 @@ paths:
       summary: EditCar
       tags:
       - CarManagement
+  /v1/notifications:
+    get:
+      description: Gets user`s profile.
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      summary: GetNotifications
+      tags:
+      - User
   /v1/rent/{carID}:
     post:
       description: Starts new rent.
@@ -424,4 +499,39 @@ paths:
       summary: GetRentHistory
       tags:
       - Rent
+  /v1/user/me:
+    get:
+      description: Gets main information about yourself.
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "405":
+          description: Method Not Allowed
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/errors.HTTPError'
+      summary: AboutMe
+      tags:
+      - User
 swagger: "2.0"

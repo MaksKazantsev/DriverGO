@@ -9,7 +9,9 @@ type Postgres struct {
 	db *gorm.DB
 }
 
-func NewRepository(db *gorm.DB) repositories.Repository {
+var _ repositories.Repository = &Postgres{}
+
+func NewRepository(db *gorm.DB) *Postgres {
 	return &Postgres{
 		db: db,
 	}

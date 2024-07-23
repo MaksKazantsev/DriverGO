@@ -22,7 +22,7 @@ func (p *Postgres) StartRent(ctx context.Context, userID, carID string) error {
 		return errors.ErrorDBWrapperC(err, "", "car already in rent")
 	}
 
-	utils.ExtractLogger(ctx).Info("repo layers successfully passed", nil)
+	utils.ExtractLogger(ctx).Trace(utils.ExtractIdempotencyKey(ctx), "repo layers successfully passed")
 	return nil
 }
 
@@ -56,7 +56,7 @@ func (p *Postgres) FinishRent(ctx context.Context, userID, rentID string) (entit
 
 	p.db.Model(&entity.UserProfile{}).Where("id = ?", userID).Update("rent_hours", gorm.Expr("rent_hours + ?", finishTime))
 
-	utils.ExtractLogger(ctx).Info("repo layers successfully passed", nil)
+	utils.ExtractLogger(ctx).Trace(utils.ExtractIdempotencyKey(ctx), "repo layers successfully passed")
 	return bill, nil
 }
 
@@ -67,7 +67,7 @@ func (p *Postgres) GetRentHistory(ctx context.Context, userID string) ([]entity.
 		return nil, errors.ErrorDBWrapper(err)
 	}
 
-	utils.ExtractLogger(ctx).Info("repo layers successfully passed", nil)
+	utils.ExtractLogger(ctx).Trace(utils.ExtractIdempotencyKey(ctx), "repo layers successfully passed")
 	return rents, nil
 }
 
@@ -90,6 +90,6 @@ func (p *Postgres) GetAvailableCars(ctx context.Context) ([]entity.Car, error) {
 		return nil, errors.ErrorDBWrapper(err)
 	}
 
-	utils.ExtractLogger(ctx).Info("repo layers successfully passed", nil)
+	utils.ExtractLogger(ctx).Trace(utils.ExtractIdempotencyKey(ctx), "repo layers successfully passed")
 	return cars, nil
 }

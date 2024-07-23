@@ -22,11 +22,49 @@ func TestMiddleWareAuth(t *testing.T) {
 func (m *MiddleWareSuitTest) SetupTest() {
 	m.srvr = fiber.New()
 
-	m.srvr.Use(CheckAuth())
-
-	m.srvr.Get("/check/auth", func(ctx *fiber.Ctx) error {
+	checkAuth := m.srvr.Group("/check")
+	checkAuth.Use(CheckAuth())
+	checkAuth.Get("/auth", func(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusOK).SendString("Authorized")
 	})
+
+	rejectNotAdmin := m.srvr.Group("/reject")
+	rejectNotAdmin.Use(RejectNotAdmin())
+	rejectNotAdmin.Get("/not_admin", func(ctx *fiber.Ctx) error {
+		return ctx.Status(http.StatusOK).SendString("Authorized")
+	})
+}
+
+func (m *MiddleWareSuitTest) TestRejectNotAdmin() {
+	// Correct token
+	token, _ := utils.NewToken(utils.ACCESS, utils.TokenData{ID: "1", Role: "admin"})
+
+	// Correct token request
+	req := httptest.NewRequest(http.MethodGet, "/reject/not_admin", nil)
+	req.Header.Set("Authorization", "Bearer: "+token)
+
+	resp, err := m.srvr.Test(req)
+	m.Require().NoError(err)
+	m.Require().Equal(http.StatusOK, resp.StatusCode)
+
+	// Incorrect token request
+	req = httptest.NewRequest(http.MethodGet, "/reject/not_admin", nil)
+	req.Header.Set("Authorization", "Bearer "+token)
+
+	resp, err = m.srvr.Test(req)
+	m.Require().NoError(err)
+	m.Require().Equal(http.StatusBadRequest, resp.StatusCode)
+
+	// Incorrect permission level
+	token, _ = utils.NewToken(utils.ACCESS, utils.TokenData{ID: "1", Role: "user"})
+
+	// Correct token request
+	req = httptest.NewRequest(http.MethodGet, "/reject/not_admin", nil)
+	req.Header.Set("Authorization", "Bearer: "+token)
+
+	resp, err = m.srvr.Test(req)
+	m.Require().NoError(err)
+	m.Require().Equal(http.StatusMethodNotAllowed, resp.StatusCode)
 
 }
 

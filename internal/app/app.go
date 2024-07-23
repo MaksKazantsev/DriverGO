@@ -5,6 +5,7 @@ import (
 	"github.com/MaksKazantsev/DriverGO/internal/config"
 	"github.com/MaksKazantsev/DriverGO/internal/handlers"
 	"github.com/MaksKazantsev/DriverGO/internal/log"
+	"github.com/MaksKazantsev/DriverGO/internal/notifications"
 	"github.com/MaksKazantsev/DriverGO/internal/repositories/postgres"
 	"github.com/MaksKazantsev/DriverGO/internal/service"
 	"github.com/gofiber/fiber/v2"
@@ -28,7 +29,7 @@ func MustStart(cfg *config.Config) {
 	l.Info("repository layer init success", nil)
 
 	// New service
-	srvc := service.NewService(repo)
+	srvc := service.NewService(repo, notifications.NewNotifier(repo))
 	l.Info("service layer init success", nil)
 
 	// New controller

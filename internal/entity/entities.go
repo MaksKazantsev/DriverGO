@@ -3,12 +3,13 @@ package entity
 import "time"
 
 type User struct {
-	ID       string `json:"id" gorm:"id;primaryKey"`
-	Email    string `json:"email" gorm:"email;unique"`
-	Username string `json:"username" gorm:"username"`
-	Password string `json:"password" gorm:"password"`
-	RFToken  string `json:"rf_token" gorm:"rf_token"`
-	FBToken  string `json:"fb_token" gorm:"fb_token"`
+	ID            string `json:"id" gorm:"id;primaryKey"`
+	Email         string `json:"email" gorm:"email;unique"`
+	Username      string `json:"username" gorm:"username"`
+	Password      string `json:"password" gorm:"password"`
+	RFToken       string `json:"rf_token" gorm:"rf_token"`
+	FBToken       string `json:"fb_token" gorm:"fb_token"`
+	Notifications int    `json:"notifications" gorm:"notifications"`
 }
 
 type UserProfile struct {
@@ -37,7 +38,7 @@ type Rent struct {
 
 type RentHistory struct {
 	ID           string        `json:"ID" gorm:"primaryKey"`
-	CarID        string        `json:"car_id" gorm:"car_id;unique"`
+	CarID        string        `json:"car_id" gorm:"car_id"`
 	UserID       string        `json:"user_id" gorm:"user_id"`
 	CarClass     string        `json:"car_class" gorm:"car_class"`
 	RentDuration time.Duration `json:"rent_duration" gorm:"rent_duration"`
@@ -50,10 +51,19 @@ type Bill struct {
 }
 
 type UserInfo struct {
-	Username  string        `json:"username"`
-	Email     string        `json:"email"`
-	Joined    string        `json:"joined"`
-	Bio       string        `json:"bio"`
-	Sex       string        `json:"sex"`
-	RentHours time.Duration `json:"rent_hours"`
+	Username      string        `json:"username"`
+	Email         string        `json:"email"`
+	Joined        time.Time     `json:"joined"`
+	Bio           string        `json:"bio"`
+	Sex           string        `json:"sex"`
+	Notifications int           `json:"notifications"`
+	RentHours     time.Duration `json:"rent_hours"`
+}
+
+type Notification struct {
+	UserID    string    `json:"userID"`
+	Title     string    `json:"title"`
+	Body      string    `json:"body"`
+	Topic     string    `json:"topic"`
+	CreatedAt time.Time `json:"created_at" gorm:"default:CURRENT_TIMESTAMP"`
 }

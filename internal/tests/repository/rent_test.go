@@ -77,7 +77,7 @@ func (pr *postgresRentSuite) SetupTest() {
 
 	// Logger to ctx
 	logger := mock_log.NewMockLogger(pr.ctrl)
-	logger.EXPECT().Info(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().Trace(gomock.Any(), gomock.Any()).AnyTimes()
 
 	pr.ctx = context.WithValue(context.Background(), utils.IdempotencyKey, uuid.NewString())
 	pr.ctx = context.WithValue(pr.ctx, utils.LoggerKey, logger)
@@ -105,7 +105,7 @@ func (pr *postgresRentSuite) SetupTest() {
 	}
 	prepatedRentHistory = []entity.RentHistory{
 		{
-			ID:           "1",
+			ID:           "2",
 			CarID:        "1",
 			UserID:       "1",
 			CarClass:     "Standard",

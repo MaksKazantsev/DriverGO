@@ -72,7 +72,7 @@ func (pc *postgresCarSuite) SetupTest() {
 
 	// Logger to ctx
 	logger := mock_log.NewMockLogger(pc.ctrl)
-	logger.EXPECT().Info(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().Trace(gomock.Any(), gomock.Any()).AnyTimes()
 
 	pc.ctx = context.WithValue(context.Background(), utils.IdempotencyKey, uuid.NewString())
 	pc.ctx = context.WithValue(pc.ctx, utils.LoggerKey, logger)

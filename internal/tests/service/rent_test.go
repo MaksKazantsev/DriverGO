@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/MaksKazantsev/DriverGO/internal/entity"
 	"github.com/MaksKazantsev/DriverGO/internal/errors"
+	"github.com/MaksKazantsev/DriverGO/internal/notifications"
 	"github.com/MaksKazantsev/DriverGO/internal/service"
 	mock_service "github.com/MaksKazantsev/DriverGO/internal/tests/mocks"
 	mock_log "github.com/MaksKazantsev/DriverGO/internal/tests/mocks/logger"
@@ -25,15 +26,17 @@ type RentTest struct {
 	ctx context.Context
 
 	repo *mock_service.MockRepository
+	noti notifications.Notifier
 	ctrl *gomock.Controller
 }
 
 func (rt *RentTest) SetupTest() {
 	rt.ctrl = gomock.NewController(rt.T())
 	rt.repo = mock_service.NewMockRepository(rt.ctrl)
+	rt.noti = notifications.NewNotifier(rt.repo)
 
 	logger := mock_log.NewMockLogger(rt.ctrl)
-	logger.EXPECT().Info(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().Trace(gomock.Any(), gomock.Any()).AnyTimes()
 
 	rt.ctx = context.WithValue(context.Background(), utils.IdempotencyKey, uuid.NewString())
 	rt.ctx = context.WithValue(rt.ctx, utils.LoggerKey, logger)
@@ -45,21 +48,25 @@ func (rt *RentTest) TearDownTest() {
 
 func (rt *RentTest) TestStartRent() {
 	// Correct Request
+	var fbToken string
+	var notification entity.Notification
 	rt.repo.EXPECT().StartRent(gomock.Any(), "1", "1").Times(1).Return(nil)
+	rt.repo.EXPECT().GetFBToken(gomock.Any(), "1").Times(1).Return(fbToken, nil)
+	rt.repo.EXPECT().SaveNotification(gomock.Any(), gomock.AssignableToTypeOf(notification)).Times(1).Return(nil)
 
 	token, _ := utils.NewToken(utils.ACCESS, utils.TokenData{ID: "1", Role: "user"})
-	err := service.NewService(rt.repo).StartRent(rt.ctx, token, "1")
+	err := service.NewService(rt.repo, rt.noti).StartRent(rt.ctx, token, "1")
 	rt.Require().NoError(err)
 
 	// Car does not exist
 	rt.repo.EXPECT().StartRent(gomock.Any(), "2", "1").Times(1).Return(errors.NewError(errors.ERR_NOT_FOUND, "car not found"))
 
 	token, _ = utils.NewToken(utils.ACCESS, utils.TokenData{ID: "2", Role: "user"})
-	err = service.NewService(rt.repo).StartRent(rt.ctx, token, "1")
+	err = service.NewService(rt.repo, rt.noti).StartRent(rt.ctx, token, "1")
 	rt.Require().Error(err)
 
 	// Wrong token
-	err = service.NewService(rt.repo).StartRent(rt.ctx, "12342141", "1")
+	err = service.NewService(rt.repo, rt.noti).StartRent(rt.ctx, "12342141", "1")
 	rt.Require().Error(err)
 }
 
@@ -73,21 +80,26 @@ func (rt *RentTest) TestFinishRent() {
 		Price:  67.2,
 	}
 
+	var fbToken string
+	var notification entity.Notification
 	rt.repo.EXPECT().FinishRent(gomock.Any(), "1", "1").Times(1).Return(res, nil)
+	rt.repo.EXPECT().GetFBToken(gomock.Any(), "1").Times(1).Return(fbToken, nil)
+	rt.repo.EXPECT().SaveNotification(gomock.Any(), gomock.AssignableToTypeOf(notification)).Times(1).Return(nil)
+
 	token, _ := utils.NewToken(utils.ACCESS, utils.TokenData{ID: userID, Role: "user"})
-	bill, err := service.NewService(rt.repo).FinishRent(rt.ctx, token, rentID)
+	bill, err := service.NewService(rt.repo, rt.noti).FinishRent(rt.ctx, token, rentID)
 	rt.Require().NoError(err)
 	rt.Require().NotEqual(entity.Bill{}, bill)
 	rt.Require().Equal(bill.ID, userID)
 
 	// Rent does not exist
 	rt.repo.EXPECT().FinishRent(gomock.Any(), "1", "1").Times(1).Return(entity.Bill{}, errors.NewError(errors.ERR_NOT_FOUND, "rent does not exist"))
-	bill, err = service.NewService(rt.repo).FinishRent(rt.ctx, token, rentID)
+	bill, err = service.NewService(rt.repo, rt.noti).FinishRent(rt.ctx, token, rentID)
 	rt.Require().Error(err)
 	rt.Require().Equal(entity.Bill{}, bill)
 
 	// Wrong token
-	bill, err = service.NewService(rt.repo).FinishRent(rt.ctx, "12342141", "1")
+	bill, err = service.NewService(rt.repo, rt.noti).FinishRent(rt.ctx, "12342141", "1")
 	rt.Require().Error(err)
 	rt.Require().Equal(entity.Bill{}, bill)
 }
@@ -113,7 +125,7 @@ func (rt *RentTest) TestGetRentHistory() {
 
 	rt.repo.EXPECT().GetRentHistory(gomock.Any(), "1").Times(1).Return(res, nil)
 	token, _ := utils.NewToken(utils.ACCESS, utils.TokenData{ID: "1", Role: "user"})
-	res, err := service.NewService(rt.repo).GetRentHistory(rt.ctx, token)
+	res, err := service.NewService(rt.repo, rt.noti).GetRentHistory(rt.ctx, token)
 	rt.Require().NoError(err)
 	rt.Require().NotEqual(nil, res)
 	for _, v := range res {
@@ -122,12 +134,12 @@ func (rt *RentTest) TestGetRentHistory() {
 
 	// No rent history
 	rt.repo.EXPECT().GetRentHistory(gomock.Any(), "1").Times(1).Return([]entity.RentHistory{}, nil)
-	res, err = service.NewService(rt.repo).GetRentHistory(rt.ctx, token)
+	res, err = service.NewService(rt.repo, rt.noti).GetRentHistory(rt.ctx, token)
 	rt.Require().NoError(err)
 	rt.Require().Equal(res, []entity.RentHistory{})
 
 	// Wrong token
-	res, err = service.NewService(rt.repo).GetRentHistory(rt.ctx, "12342141")
+	res, err = service.NewService(rt.repo, rt.noti).GetRentHistory(rt.ctx, "12342141")
 	rt.Require().Error(err)
 	rt.Require().Nil(res)
 }
@@ -153,13 +165,13 @@ func (rt *RentTest) TestGetAvailableCars() {
 	}
 
 	rt.repo.EXPECT().GetAvailableCars(gomock.Any()).Times(1).Return(res, nil)
-	res, err := service.NewService(rt.repo).GetAvailableCars(rt.ctx)
+	res, err := service.NewService(rt.repo, rt.noti).GetAvailableCars(rt.ctx)
 	rt.Require().NoError(err)
 	rt.Require().NotEqual(nil, res)
 
 	// No available cars
 	rt.repo.EXPECT().GetAvailableCars(gomock.Any()).Times(1).Return([]entity.Car{}, nil)
-	res, err = service.NewService(rt.repo).GetAvailableCars(rt.ctx)
+	res, err = service.NewService(rt.repo, rt.noti).GetAvailableCars(rt.ctx)
 	rt.Require().NoError(err)
 	rt.Require().Equal(res, []entity.Car{})
 

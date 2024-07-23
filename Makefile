@@ -1,5 +1,7 @@
 COMPOSE_FILE ?= $(CURDIR)/containers/docker-compose.yaml
 CONFIG_FILE ?= config/config.local.yaml
+TESTS_SERVICE ?= internal/tests/service
+TESTS_REPO ?= internal/tests/repository
 
 # Target to start the PostgreSQL container using Docker Compose
 postgres:
@@ -21,4 +23,17 @@ clean:
 	@echo "Stopping and removing all containers, networks, and volumes defined in: $(COMPOSE_FILE)"
 	docker-compose -f $(COMPOSE_FILE) down -v
 
-.PHONY: postgres local clean
+service-test:
+	@echo "Running tests in the service directory: $(TESTS_SERVICE)"
+	cd $(TESTS_SERVICE) && go test ./...
+
+repo-test:
+	@echo "Running tests in the repository directory: $(TESTS_REPO)"
+	cd $(TESTS_REPO) && go test ./...
+
+test:
+	@echo "Starting linter test..."
+	golangci-lint run
+
+
+.PHONY: postgres local build clean service-test repo-test

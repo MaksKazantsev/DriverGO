@@ -20,6 +20,7 @@ func MustConnect(dsn string) *gorm.DB {
 		&entity.Rent{},
 		&entity.RentHistory{},
 		&entity.Bill{},
+		&entity.Notification{},
 	); err != nil {
 		panic("failed to migrate db: " + err.Error())
 	}

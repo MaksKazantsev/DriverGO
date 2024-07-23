@@ -47,4 +47,9 @@ func (c controller) SetupRoutes(app *fiber.App, log log.Logger) {
 	admin.Post("/", c.CarHandler.AddCar)
 	admin.Delete("/:carID", c.CarHandler.RemoveCar)
 	admin.Put("/:carID", c.CarHandler.EditCar)
+
+	user := v1.Group("/user").Use(middleware.CheckAuth(), wrappers.EmbedLogger(log), wrappers.WithIdempotencyKey())
+	user.Get("/me", c.UserHandler.AboutMe)
+	user.Get("/:userID", c.UserHandler.GetProfile)
+	user.Get("/notifications", c.UserHandler.GetNotifications)
 }

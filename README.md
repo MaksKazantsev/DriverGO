@@ -5,10 +5,13 @@ DriverGO - is a Golang realization of car rental service, built according to a M
 - PostgreSQL
 - HTTP/Fiber
 - Gomock (Mocks)
+- JWT Authentication
+- Docker-compose
+- Zap (Logging)
 
 ## Features
 - Project wrote according to Bob Bowman`s clean architecture
-- All routes are optimised (less then 100ms to respond)
+- All routes are optimised (less than 100ms to respond)
 - Most of the code is covered with UNIT-tests
 - Code follows SOLID principles
 

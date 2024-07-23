@@ -18,6 +18,11 @@ func RejectNotAdmin() fiber.Handler {
 			return nil
 		}
 
+		if valuesArr[0] != "Bearer:" {
+			_ = ctx.Status(http.StatusBadRequest).SendString("wrong request signature")
+			return nil
+		}
+
 		claims, err := utils.ParseToken(valuesArr[1])
 		if err != nil {
 			_ = ctx.Status(http.StatusMethodNotAllowed).SendString(err.Error())

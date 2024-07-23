@@ -36,6 +36,21 @@ func (m *MockRepository) EXPECT() *MockRepositoryMockRecorder {
 	return m.recorder
 }
 
+// AboutMe mocks base method.
+func (m *MockRepository) AboutMe(ctx context.Context, userID string) (entity.UserInfo, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AboutMe", ctx, userID)
+	ret0, _ := ret[0].(entity.UserInfo)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AboutMe indicates an expected call of AboutMe.
+func (mr *MockRepositoryMockRecorder) AboutMe(ctx, userID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AboutMe", reflect.TypeOf((*MockRepository)(nil).AboutMe), ctx, userID)
+}
+
 // AddCar mocks base method.
 func (m *MockRepository) AddCar(ctx context.Context, car entity.Car) error {
 	m.ctrl.T.Helper()
@@ -94,6 +109,36 @@ func (mr *MockRepositoryMockRecorder) GetAvailableCars(ctx interface{}) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAvailableCars", reflect.TypeOf((*MockRepository)(nil).GetAvailableCars), ctx)
 }
 
+// GetFBToken mocks base method.
+func (m *MockRepository) GetFBToken(ctx context.Context, userID string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFBToken", ctx, userID)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetFBToken indicates an expected call of GetFBToken.
+func (mr *MockRepositoryMockRecorder) GetFBToken(ctx, userID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFBToken", reflect.TypeOf((*MockRepository)(nil).GetFBToken), ctx, userID)
+}
+
+// GetNotifications mocks base method.
+func (m *MockRepository) GetNotifications(ctx context.Context, userID string) ([]entity.Notification, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetNotifications", ctx, userID)
+	ret0, _ := ret[0].([]entity.Notification)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetNotifications indicates an expected call of GetNotifications.
+func (mr *MockRepositoryMockRecorder) GetNotifications(ctx, userID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNotifications", reflect.TypeOf((*MockRepository)(nil).GetNotifications), ctx, userID)
+}
+
 // GetPasswordAndID mocks base method.
 func (m *MockRepository) GetPasswordAndID(ctx context.Context, email string) (string, string, error) {
 	m.ctrl.T.Helper()
@@ -108,6 +153,21 @@ func (m *MockRepository) GetPasswordAndID(ctx context.Context, email string) (st
 func (mr *MockRepositoryMockRecorder) GetPasswordAndID(ctx, email interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPasswordAndID", reflect.TypeOf((*MockRepository)(nil).GetPasswordAndID), ctx, email)
+}
+
+// GetProfile mocks base method.
+func (m *MockRepository) GetProfile(ctx context.Context, userID string) (entity.UserProfile, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetProfile", ctx, userID)
+	ret0, _ := ret[0].(entity.UserProfile)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetProfile indicates an expected call of GetProfile.
+func (mr *MockRepositoryMockRecorder) GetProfile(ctx, userID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProfile", reflect.TypeOf((*MockRepository)(nil).GetProfile), ctx, userID)
 }
 
 // GetRentHistory mocks base method.
@@ -182,6 +242,20 @@ func (m *MockRepository) RemoveCar(ctx context.Context, carID string) error {
 func (mr *MockRepositoryMockRecorder) RemoveCar(ctx, carID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveCar", reflect.TypeOf((*MockRepository)(nil).RemoveCar), ctx, carID)
+}
+
+// SaveNotification mocks base method.
+func (m *MockRepository) SaveNotification(ctx context.Context, notification entity.Notification) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SaveNotification", ctx, notification)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveNotification indicates an expected call of SaveNotification.
+func (mr *MockRepositoryMockRecorder) SaveNotification(ctx, notification interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveNotification", reflect.TypeOf((*MockRepository)(nil).SaveNotification), ctx, notification)
 }
 
 // StartRent mocks base method.
@@ -427,4 +501,124 @@ func (m *MockCarManagement) RemoveCar(ctx context.Context, carID string) error {
 func (mr *MockCarManagementMockRecorder) RemoveCar(ctx, carID interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveCar", reflect.TypeOf((*MockCarManagement)(nil).RemoveCar), ctx, carID)
+}
+
+// MockUser is a mock of User interface.
+type MockUser struct {
+	ctrl     *gomock.Controller
+	recorder *MockUserMockRecorder
+}
+
+// MockUserMockRecorder is the mock recorder for MockUser.
+type MockUserMockRecorder struct {
+	mock *MockUser
+}
+
+// NewMockUser creates a new mock instance.
+func NewMockUser(ctrl *gomock.Controller) *MockUser {
+	mock := &MockUser{ctrl: ctrl}
+	mock.recorder = &MockUserMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockUser) EXPECT() *MockUserMockRecorder {
+	return m.recorder
+}
+
+// AboutMe mocks base method.
+func (m *MockUser) AboutMe(ctx context.Context, userID string) (entity.UserInfo, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AboutMe", ctx, userID)
+	ret0, _ := ret[0].(entity.UserInfo)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AboutMe indicates an expected call of AboutMe.
+func (mr *MockUserMockRecorder) AboutMe(ctx, userID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AboutMe", reflect.TypeOf((*MockUser)(nil).AboutMe), ctx, userID)
+}
+
+// GetNotifications mocks base method.
+func (m *MockUser) GetNotifications(ctx context.Context, userID string) ([]entity.Notification, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetNotifications", ctx, userID)
+	ret0, _ := ret[0].([]entity.Notification)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetNotifications indicates an expected call of GetNotifications.
+func (mr *MockUserMockRecorder) GetNotifications(ctx, userID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetNotifications", reflect.TypeOf((*MockUser)(nil).GetNotifications), ctx, userID)
+}
+
+// GetProfile mocks base method.
+func (m *MockUser) GetProfile(ctx context.Context, userID string) (entity.UserProfile, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetProfile", ctx, userID)
+	ret0, _ := ret[0].(entity.UserProfile)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetProfile indicates an expected call of GetProfile.
+func (mr *MockUserMockRecorder) GetProfile(ctx, userID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProfile", reflect.TypeOf((*MockUser)(nil).GetProfile), ctx, userID)
+}
+
+// MockNotifierRepo is a mock of NotifierRepo interface.
+type MockNotifierRepo struct {
+	ctrl     *gomock.Controller
+	recorder *MockNotifierRepoMockRecorder
+}
+
+// MockNotifierRepoMockRecorder is the mock recorder for MockNotifierRepo.
+type MockNotifierRepoMockRecorder struct {
+	mock *MockNotifierRepo
+}
+
+// NewMockNotifierRepo creates a new mock instance.
+func NewMockNotifierRepo(ctrl *gomock.Controller) *MockNotifierRepo {
+	mock := &MockNotifierRepo{ctrl: ctrl}
+	mock.recorder = &MockNotifierRepoMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockNotifierRepo) EXPECT() *MockNotifierRepoMockRecorder {
+	return m.recorder
+}
+
+// GetFBToken mocks base method.
+func (m *MockNotifierRepo) GetFBToken(ctx context.Context, userID string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetFBToken", ctx, userID)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetFBToken indicates an expected call of GetFBToken.
+func (mr *MockNotifierRepoMockRecorder) GetFBToken(ctx, userID interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFBToken", reflect.TypeOf((*MockNotifierRepo)(nil).GetFBToken), ctx, userID)
+}
+
+// SaveNotification mocks base method.
+func (m *MockNotifierRepo) SaveNotification(ctx context.Context, notification entity.Notification) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "SaveNotification", ctx, notification)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// SaveNotification indicates an expected call of SaveNotification.
+func (mr *MockNotifierRepoMockRecorder) SaveNotification(ctx, notification interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SaveNotification", reflect.TypeOf((*MockNotifierRepo)(nil).SaveNotification), ctx, notification)
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/MaksKazantsev/DriverGO/internal/entity"
 	"github.com/MaksKazantsev/DriverGO/internal/errors"
+	"github.com/MaksKazantsev/DriverGO/internal/notifications"
 	"github.com/MaksKazantsev/DriverGO/internal/service"
 	"github.com/MaksKazantsev/DriverGO/internal/service/models"
 	mock_service "github.com/MaksKazantsev/DriverGO/internal/tests/mocks"
@@ -26,14 +27,16 @@ type CarTest struct {
 
 	ctrl *gomock.Controller
 	repo *mock_service.MockRepository
+	noti notifications.Notifier
 }
 
 func (r *CarTest) SetupTest() {
 	r.ctrl = gomock.NewController(r.T())
 	r.repo = mock_service.NewMockRepository(r.ctrl)
+	r.noti = notifications.NewNotifier(r.repo)
 
 	logger := mock_log.NewMockLogger(r.ctrl)
-	logger.EXPECT().Info(gomock.Any(), gomock.Any()).AnyTimes()
+	logger.EXPECT().Trace(gomock.Any(), gomock.Any()).AnyTimes()
 
 	r.ctx = context.WithValue(context.Background(), utils.IdempotencyKey, uuid.NewString())
 	r.ctx = context.WithValue(r.ctx, utils.LoggerKey, logger)
@@ -58,7 +61,7 @@ func (r *CarTest) TestAddCar() {
 		Brand: "BMW",
 	}
 
-	err := service.NewService(r.repo).AddCar(r.ctx, req)
+	err := service.NewService(r.repo, r.noti).AddCar(r.ctx, req)
 	r.Require().NoError(err)
 
 	// Invalid class
@@ -75,7 +78,7 @@ func (r *CarTest) TestAddCar() {
 		Brand: "BMW",
 	}
 
-	err = service.NewService(r.repo).AddCar(r.ctx, req)
+	err = service.NewService(r.repo, r.noti).AddCar(r.ctx, req)
 	r.Require().Error(err)
 }
 
@@ -85,7 +88,7 @@ func (r *CarTest) TestRemoveCar() {
 
 	r.repo.EXPECT().RemoveCar(gomock.Any(), carID).Times(1).Return(nil)
 
-	err := service.NewService(r.repo).RemoveCar(r.ctx, carID)
+	err := service.NewService(r.repo, r.noti).RemoveCar(r.ctx, carID)
 	r.Require().NoError(err)
 }
 
@@ -99,6 +102,6 @@ func (r *CarTest) TestEditCar() {
 
 	r.repo.EXPECT().EditCar(gomock.Any(), req, carID).Times(1).Return(nil)
 
-	err := service.NewService(r.repo).EditCar(r.ctx, req, carID)
+	err := service.NewService(r.repo, r.noti).EditCar(r.ctx, req, carID)
 	r.Require().NoError(err)
 }
