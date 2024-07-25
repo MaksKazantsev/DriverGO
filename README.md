@@ -8,6 +8,8 @@ DriverGO - is a Golang realization of car rental service, built according to a M
 - JWT Authentication
 - Docker-compose
 - Zap (Logging)
+- Testcontainers (Tests)
+- Prometheus/Grafana (Metrics)
 
 ## Features
 - Project wrote according to Bob Bowman`s clean architecture
