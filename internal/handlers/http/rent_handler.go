@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/MaksKazantsev/DriverGO/internal/errors"
+	"github.com/MaksKazantsev/DriverGO/internal/metrics"
 	"github.com/MaksKazantsev/DriverGO/internal/service"
 	"github.com/gofiber/fiber/v2"
 	"net/http"
@@ -9,11 +10,13 @@ import (
 
 type RentHandler struct {
 	uc service.Rent
+	m  metrics.Metrics
 }
 
-func RegisterRentHandler(uc service.Rent) *RentHandler {
+func RegisterRentHandler(uc service.Rent, m metrics.Metrics) *RentHandler {
 	return &RentHandler{
 		uc: uc,
+		m:  m,
 	}
 }
 
@@ -36,10 +39,12 @@ func (r *RentHandler) StartRent(c *fiber.Ctx) error {
 
 	if err := r.uc.StartRent(c.UserContext(), token, carID); err != nil {
 		st, msg := errors.FromError(err, c.UserContext())
+		r.m.Increment(st, c.Method())
 		_ = c.Status(st).JSON(errors.HTTPError{ErrorCode: st, ErrorMsg: msg})
 		return nil
 	}
 
+	r.m.Increment(http.StatusCreated, c.Method())
 	c.Status(http.StatusCreated)
 	return nil
 }
@@ -64,10 +69,12 @@ func (r *RentHandler) FinishRent(c *fiber.Ctx) error {
 	bill, err := r.uc.FinishRent(c.UserContext(), token, rentID)
 	if err != nil {
 		st, msg := errors.FromError(err, c.UserContext())
+		r.m.Increment(st, c.Method())
 		_ = c.Status(st).JSON(errors.HTTPError{ErrorCode: st, ErrorMsg: msg})
 		return nil
 	}
 
+	r.m.Increment(http.StatusOK, c.Method())
 	_ = c.Status(http.StatusOK).JSON(fiber.Map{"bill": bill})
 	return nil
 }
@@ -90,10 +97,12 @@ func (r *RentHandler) GetRentHistory(c *fiber.Ctx) error {
 	rents, err := r.uc.GetRentHistory(c.UserContext(), token)
 	if err != nil {
 		st, msg := errors.FromError(err, c.UserContext())
+		r.m.Increment(st, c.Method())
 		_ = c.Status(st).JSON(errors.HTTPError{ErrorCode: st, ErrorMsg: msg})
 		return nil
 	}
 
+	r.m.Increment(http.StatusOK, c.Method())
 	_ = c.Status(http.StatusOK).JSON(fiber.Map{"rents": rents})
 	return nil
 }
@@ -114,10 +123,12 @@ func (r *RentHandler) GetAvailableCars(c *fiber.Ctx) error {
 	cars, err := r.uc.GetAvailableCars(c.UserContext())
 	if err != nil {
 		st, msg := errors.FromError(err, c.UserContext())
+		r.m.Increment(st, c.Method())
 		_ = c.Status(st).JSON(errors.HTTPError{ErrorCode: st, ErrorMsg: msg})
 		return nil
 	}
 
+	r.m.Increment(http.StatusOK, c.Method())
 	_ = c.Status(http.StatusOK).JSON(fiber.Map{"cars": cars})
 	return nil
 }

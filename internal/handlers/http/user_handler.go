@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/MaksKazantsev/DriverGO/internal/errors"
+	"github.com/MaksKazantsev/DriverGO/internal/metrics"
 	"github.com/MaksKazantsev/DriverGO/internal/service"
 	"github.com/gofiber/fiber/v2"
 	"net/http"
@@ -9,6 +10,14 @@ import (
 
 type UserHandler struct {
 	uc service.User
+	m  metrics.Metrics
+}
+
+func RegisterUserHandler(uc service.User, m metrics.Metrics) *UserHandler {
+	return &UserHandler{
+		uc: uc,
+		m:  m,
+	}
 }
 
 // AboutMe godoc
@@ -29,10 +38,12 @@ func (u *UserHandler) AboutMe(c *fiber.Ctx) error {
 	info, err := u.uc.AboutMe(c.UserContext(), token)
 	if err != nil {
 		st, msg := errors.FromError(err, c.UserContext())
+		u.m.Increment(st, "GET")
 		_ = c.Status(st).JSON(errors.HTTPError{ErrorCode: st, ErrorMsg: msg})
 		return nil
 	}
 
+	u.m.Increment(http.StatusOK, "GET")
 	_ = c.Status(http.StatusOK).JSON(fiber.Map{"info": info})
 	return nil
 }
@@ -56,10 +67,12 @@ func (u *UserHandler) GetProfile(c *fiber.Ctx) error {
 	profile, err := u.uc.GetProfile(c.UserContext(), userID)
 	if err != nil {
 		st, msg := errors.FromError(err, c.UserContext())
+		u.m.Increment(st, "GET")
 		_ = c.Status(st).JSON(errors.HTTPError{ErrorCode: st, ErrorMsg: msg})
 		return nil
 	}
 
+	u.m.Increment(http.StatusOK, "GET")
 	_ = c.Status(http.StatusOK).JSON(fiber.Map{"profile": profile})
 	return nil
 }
@@ -82,10 +95,12 @@ func (u *UserHandler) GetNotifications(c *fiber.Ctx) error {
 	notifications, err := u.uc.GetNotifications(c.UserContext(), token)
 	if err != nil {
 		st, msg := errors.FromError(err, c.UserContext())
+		u.m.Increment(st, "GET")
 		_ = c.Status(st).JSON(errors.HTTPError{ErrorCode: st, ErrorMsg: msg})
 		return nil
 	}
 
+	u.m.Increment(http.StatusOK, "GET")
 	_ = c.Status(http.StatusOK).JSON(fiber.Map{"notifications": notifications})
 	return nil
 }

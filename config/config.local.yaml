@@ -1,5 +1,5 @@
 env: local
-port: 3000
+port: 3002
 db:
   postgres:
     host: 127.0.0.1

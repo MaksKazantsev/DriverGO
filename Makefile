@@ -1,12 +1,17 @@
-COMPOSE_FILE ?= $(CURDIR)/containers/docker-compose.yaml
+COMPOSE_FILE_POSTGRES ?= $(CURDIR)/containers/docker-compose.postgres.yaml
+COMPOSE_FILE_PROMETHEUS ?= $(CURDIR)/containers/docker-compose.prometheus.yaml
 CONFIG_FILE ?= config/config.local.yaml
 TESTS_SERVICE ?= internal/tests/service
 TESTS_REPO ?= internal/tests/repository
 
 # Target to start the PostgreSQL container using Docker Compose
 postgres:
-	@echo "Starting Docker Compose with file located at: $(COMPOSE_FILE)"
-	docker-compose -f $(COMPOSE_FILE) up -d
+	@echo "Starting Docker Compose for Postgres with file located at: $(COMPOSE_FILE)"
+	docker-compose -f $(COMPOSE_FILE_POSTGRES) up
+
+prometheus:
+	@echo "Starting Docker Compose for Prometheus with file located at: $(COMPOSE_FILE)"
+	docker-compose -f $(COMPOSE_FILE_PROMETHEUS) up
 
 # Target to run the local Go application
 local:

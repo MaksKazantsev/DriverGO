@@ -2,6 +2,7 @@ package http
 
 import (
 	"github.com/MaksKazantsev/DriverGO/internal/errors"
+	"github.com/MaksKazantsev/DriverGO/internal/metrics"
 	"github.com/MaksKazantsev/DriverGO/internal/service"
 	"github.com/MaksKazantsev/DriverGO/internal/service/models"
 	"github.com/gofiber/fiber/v2"
@@ -10,11 +11,13 @@ import (
 
 type CarHandler struct {
 	uc service.CarManagement
+	m  metrics.Metrics
 }
 
-func RegisterCarHandler(uc service.CarManagement) *CarHandler {
+func RegisterCarHandler(uc service.CarManagement, m metrics.Metrics) *CarHandler {
 	return &CarHandler{
 		uc: uc,
+		m:  m,
 	}
 }
 
@@ -42,10 +45,12 @@ func (cr *CarHandler) AddCar(c *fiber.Ctx) error {
 
 	if err = cr.uc.AddCar(c.UserContext(), req); err != nil {
 		st, msg := errors.FromError(err, c.UserContext())
+		cr.m.Increment(st, "POST")
 		_ = c.Status(st).JSON(errors.HTTPError{ErrorCode: st, ErrorMsg: msg})
 		return nil
 	}
 
+	cr.m.Increment(http.StatusCreated, "POST")
 	c.Status(http.StatusCreated)
 	return nil
 }
@@ -68,10 +73,12 @@ func (cr *CarHandler) RemoveCar(c *fiber.Ctx) error {
 
 	if err := cr.uc.RemoveCar(c.UserContext(), carID); err != nil {
 		st, msg := errors.FromError(err, c.UserContext())
+		cr.m.Increment(st, "DELETE")
 		_ = c.Status(st).JSON(errors.HTTPError{ErrorCode: st, ErrorMsg: msg})
 		return nil
 	}
 
+	cr.m.Increment(http.StatusOK, "DELETE")
 	c.Status(http.StatusOK)
 	return nil
 }
@@ -100,10 +107,12 @@ func (cr *CarHandler) EditCar(c *fiber.Ctx) error {
 
 	if err := cr.uc.EditCar(c.UserContext(), req, carID); err != nil {
 		st, msg := errors.FromError(err, c.UserContext())
+		cr.m.Increment(st, "DELETE")
 		_ = c.Status(st).JSON(errors.HTTPError{ErrorCode: st, ErrorMsg: msg})
 		return nil
 	}
 
+	cr.m.Increment(http.StatusOK, "PUT")
 	c.Status(http.StatusOK)
 	return nil
 }
